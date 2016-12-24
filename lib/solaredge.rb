@@ -2,7 +2,7 @@ require "json"
 require "excon"
 require "solaredge/version"
 
-module Solaredge
+module SolarEdge
   class Api
 
     BASE_URL = 'https://monitoringapi.solaredge.com'

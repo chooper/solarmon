@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class SolaredgeTest < Minitest::Test
+class SolarEdgeTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Solaredge::VERSION
+    refute_nil ::SolarEdge::VERSION
   end
 
   def test_it_does_something_useful

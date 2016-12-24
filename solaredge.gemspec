@@ -5,7 +5,7 @@ require 'solaredge/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "solaredge"
-  spec.version       = Solaredge::VERSION
+  spec.version       = SolarEdge::VERSION
   spec.authors       = ["Charles Hooper"]
   spec.email         = ["chooper@plumata.com"]
 
