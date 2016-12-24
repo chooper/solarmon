@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "solaredge"
+
+def main
+  api_key = ENV['SOLAREDGE_API_KEY']
+  site_id = ENV['SOLAREDGE_SITE_ID']
+
+  api = Solaredge::Api.new(api_key)
+  response = api.site_energy(site_id: site_id,
+    start_date: Time.now,
+    end_date: Time.now,
+    time_unit: "DAY")
+
+  unit = response["energy"]["unit"]
+  values = response["energy"]["values"].reject {|e| e["value"].nil? }
+  production = values.map {|v| v["value"]}.reduce(&:+)
+  puts "This site has produced #{production/1000} k#{unit} of energy today"
+end
+
+if $0 == __FILE__
+  main
+end
