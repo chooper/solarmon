@@ -43,10 +43,8 @@ module SolarEdge
       raise "Connect to the database prior to calling this method!" if !@db
       raise ArgumentError.new("Got unexpected unit! #{unit.inspect}") if unit != EXPECTED_UNIT
 
-      @db.transaction do
-        values.map do |v|
-          save_value_to_database(v, unit)
-        end
+      values.map do |v|
+        save_value_to_database(v, unit)
       end
 
       puts "Saved #{values.length} records to database"
