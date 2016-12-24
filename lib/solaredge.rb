@@ -64,8 +64,7 @@ module SolarEdge
         unit: unit}
 
       @db[:energy].insert(record)
-    rescue Sequel::UniqueConstraintViolation
-      # TODO: postgres exeption
+    rescue PG::UniqueViolation, Sequel::UniqueConstraintViolation
       nil
     end
 
