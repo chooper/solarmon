@@ -1,45 +1,79 @@
-require "json"
-require "excon"
+module SolarEdge; end
+
+require "solaredge/api"
+require "solaredge/storage"
 require "solaredge/version"
 
+# TODO(charles) replace puts with logging
+
 module SolarEdge
-  class Api
+  class SyncMachine
 
-    BASE_URL = 'https://monitoringapi.solaredge.com'
-    ALLOWED_TIME_UNITS = %w{QUARTER_OF_AN_HOUR HOUR DAY WEEK MONTH YEAR}
+    EXPECTED_UNIT = 'Wh'
 
-    def initialize(api_key)
-      @api_key = api_key
+    def initialize(site_id, api_key)
+      @site_id = site_id
+      @api = SolarEdge::Api.new(api_key)
     end
 
-    # accept Time args
-    def site_energy(site_id:, start_date:, end_date:, time_unit:)
-      start_date = start_date.strftime("%Y-%m-%d")
-      end_date = end_date.strftime("%Y-%m-%d")
-      raise ArgumentError.new("Invalid time_unit #{time_unit.inspect}") if !ALLOWED_TIME_UNITS.include?(time_unit)
+    attr_reader :site_id
 
-      _request('energy', {
-        siteId: site_id,
-        startDate: start_date,
-        endDate: end_date,
-        timeUnit: time_unit
-      })
+    def sync!
+      connect_database
+      energy_values, energy_unit = get_energy_values_from_api
+      save_values_to_database(energy_values, energy_unit)
     end
 
-    def _request(method, params={})
-      url = if params[:siteId]
-        [BASE_URL, 'site', params.delete(:siteId), "#{method}.json"].join('/')
-      else
-        [BASE_URL, "#{method}.json"].join('/')
+    def get_energy_values_from_api
+      puts "Getting energy values from API"
+      t = Time.now
+      response = @api.site_energy(site_id: site_id,
+        start_date: t,
+        end_date: t,
+        time_unit: "QUARTER_OF_AN_HOUR")
+
+      unit = response.fetch("energy").fetch("unit")
+      values = response.fetch("energy").fetch("values").reject {|e| e["value"].nil? }
+      puts "Received #{values.length} non-nil values"
+      [values, unit]
+    end
+
+    def save_values_to_database(values, unit)
+      puts "Saving values to database"
+      raise "Connect to the database prior to calling this method!" if !@db
+      raise ArgumentError.new("Got unexpected unit! #{unit.inspect}") if unit != EXPECTED_UNIT
+
+      @db.transaction do
+        values.map do |v|
+          save_value_to_database(v, unit)
+        end
       end
 
-      params[:api_key] = @api_key
-      # build request arguments
-      url += '?' + params.map {|k,v| "#{k}=#{v}"}.join('&')
+      puts "Saved #{values.length} records to database"
+      true
+    end
 
-      response = Excon.get(url)
-      body = response.body
-      JSON.parse(body)
+    def save_value_to_database(value, unit)
+      raise "Connect to the database prior to calling this method!" if !@db
+      raise ArgumentError.new("Got unexpected unit! #{unit.inspect}") if unit != EXPECTED_UNIT
+
+      record = {
+        siteID: site_id,
+        date: value["date"],
+        value: value["value"],
+        unit: unit}
+
+      @db[:energy].insert(record)
+    rescue Sequel::UniqueConstraintViolation
+      # TODO: postgres exeption
+      nil
+    end
+
+    def connect_database
+      puts "Connecting to database"
+      @db = SolarEdge::Storage.connect_database
+      SolarEdge::Storage.create_database_tables!(@db)
+      @db
     end
   end
 end

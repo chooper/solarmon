@@ -1,0 +1,33 @@
+require "sequel"
+require "logger"
+
+module SolarEdge::Storage
+  def self.connect_database
+    url = ENV['DATABASE_URL'] || 'sqlite://db.sqlite'
+    db = Sequel.connect(url, loggers: [Logger.new($stdout)])
+    log_level = ENV['SQL_DEBUG'] || 'debug'
+    log_level = log_level.downcase.to_sym
+    db.sql_log_level = log_level
+    db
+  end
+
+  def self.create_database_tables!(db)
+    create_energy_table!(db)
+  end
+
+  def self.create_energy_table!(db)
+    db.create_table :energy do
+      primary_key :eveboxID
+      Integer     :siteID
+      Time        :date
+      Double      :value
+      String      :unit
+      unique      [:siteID, :date]
+    end
+    true
+  rescue Sequel::DatabaseError, PG::DuplicateTable
+    # table probably already existed
+    # TODO(charles) log this
+    false
+  end
+end

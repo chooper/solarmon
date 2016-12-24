@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "solaredge"
+
+def main
+  ENV.source('.env') if !ENV['SOLAREDGE_API_KEY'] && !ENV['SOLAREDGE_SITE_ID']
+
+  api_key = ENV['SOLAREDGE_API_KEY']
+  site_id = ENV['SOLAREDGE_SITE_ID']
+#  raise "DATABASE_URL not found!" if !ENV['DATABASE_URL']
+
+  sm = SolarEdge::SyncMachine.new(site_id, api_key)
+  sm.sync!
+end
+
+if $0 == __FILE__
+  main
+end
