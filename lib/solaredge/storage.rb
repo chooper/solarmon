@@ -19,7 +19,7 @@ module SolarEdge::Storage
     db.create_table :energy do
       primary_key :ID
       Integer     :siteID
-      Date        :date
+      DateTime    :date
       Float       :value
       String      :unit
       unique      [:siteID, :date]
