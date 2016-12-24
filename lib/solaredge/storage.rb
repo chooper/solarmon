@@ -17,10 +17,10 @@ module SolarEdge::Storage
 
   def self.create_energy_table!(db)
     db.create_table :energy do
-      primary_key :eveboxID
+      primary_key :ID
       Integer     :siteID
-      Time        :date
-      Double      :value
+      Date        :date
+      Float       :value
       String      :unit
       unique      [:siteID, :date]
     end
