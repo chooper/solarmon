@@ -28,12 +28,13 @@ module SolarEdge
       save_values_to_database(energy_values, energy_unit)
     end
 
-    def get_energy_values_from_api
+    def get_energy_values_from_api(start_date: nil, end_date: nil)
       puts "Getting energy values from API"
-      t = tz.now
+      start_date ||= tz.now
+      end_date   ||= tz.now
       response = @api.site_energy(site_id: site_id,
-        start_date: t,
-        end_date: t,
+        start_date: start_date,
+        end_date: end_date,
         time_unit: "QUARTER_OF_AN_HOUR")
 
       unit = response.fetch("energy").fetch("unit")
