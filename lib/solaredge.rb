@@ -16,9 +16,11 @@ module SolarEdge
       @site_id = site_id
       @api = SolarEdge::Api.new(api_key)
       @tz = TZInfo::Timezone.get(ENV['TZ'])
+      # HACK(charles) Figure out if we're PST vs PDT
+      @tz_name = @tz.offsets_up_to(Time.now.getutc, Time.now.getutc - 1).first.abbreviation.to_s
     end
 
-    attr_reader :site_id, :tz
+    attr_reader :site_id, :tz, :tz_name
 
     def sync!
       connect_database
@@ -59,7 +61,7 @@ module SolarEdge
 
       record = {
         siteID: site_id,
-        date: tz.local_to_utc(value["date"]),
+        date: tz.local_to_utc(Time.parse("#{value["date"]} #{tz_name}")),
         value: value["value"],
         unit: unit}
 
