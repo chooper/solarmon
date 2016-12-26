@@ -1,5 +1,6 @@
 module SolarEdge; end
 
+require 'tzinfo'
 require "solaredge/api"
 require "solaredge/storage"
 require "solaredge/version"
@@ -14,9 +15,10 @@ module SolarEdge
     def initialize(site_id, api_key)
       @site_id = site_id
       @api = SolarEdge::Api.new(api_key)
+      @tz = TZInfo::Timezone.get(ENV['TZ'])
     end
 
-    attr_reader :site_id
+    attr_reader :site_id, :tz
 
     def sync!
       connect_database
@@ -26,7 +28,7 @@ module SolarEdge
 
     def get_energy_values_from_api
       puts "Getting energy values from API"
-      t = Time.now
+      t = tz.now
       response = @api.site_energy(site_id: site_id,
         start_date: t,
         end_date: t,
@@ -57,7 +59,7 @@ module SolarEdge
 
       record = {
         siteID: site_id,
-        date: value["date"],
+        date: tz.local_to_utc(value["date"]),
         value: value["value"],
         unit: unit}
 
