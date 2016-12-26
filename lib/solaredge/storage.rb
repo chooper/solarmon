@@ -1,5 +1,6 @@
 require "sequel"
 require "logger"
+require "pg"
 
 module SolarEdge::Storage
   def self.connect_database
