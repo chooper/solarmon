@@ -11,6 +11,12 @@ module SolarEdge
       @api_key = api_key
     end
 
+    def site_details(site_id:)
+      _request('details', {
+        siteId: site_id,
+      })
+    end
+
     # accept Time args
     def site_energy(site_id:, start_date:, end_date:, time_unit:)
       start_date = start_date.strftime("%Y-%m-%d")
