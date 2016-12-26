@@ -4,6 +4,7 @@ require "pg"
 
 module SolarEdge::Storage
   def self.connect_database
+    Sequel.default_timezone = :utc
     url = ENV['DATABASE_URL'] || 'sqlite://db.sqlite'
     db = Sequel.connect(url, loggers: [Logger.new($stdout)])
     log_level = ENV['SQL_DEBUG'] || 'debug'
