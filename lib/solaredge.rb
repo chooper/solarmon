@@ -48,11 +48,13 @@ module SolarEdge
       raise "Connect to the database prior to calling this method!" if !@db
       raise ArgumentError.new("Got unexpected unit! #{unit.inspect}") if unit != EXPECTED_UNIT
 
+      records_saved = 0
       values.map do |v|
-        save_value_to_database(v, unit)
+        saved = save_value_to_database(v, unit)
+        records_saved += 1 if saved
       end
 
-      puts "Saved #{values.length} records to database"
+      puts "Saved #{records_saved} records to database"
       true
     end
 
@@ -66,9 +68,19 @@ module SolarEdge
         value: value["value"],
         unit: unit}
 
-      @db[:energy].insert(record)
-    rescue PG::UniqueViolation, Sequel::UniqueConstraintViolation
-      nil
+      record_count = @db.from(:energy).where(
+        siteID: record.fetch(:siteID),
+        date: record.fetch(:date),
+      ).limit(1).count
+
+      records_inserted = 0
+      if record_count > 0
+        puts "Skipping (#{record.fetch(:siteID)}, #{record.fetch(:date)}); already exists"
+        false
+      else
+        @db[:energy].insert(record)
+        true
+      end
     end
 
     def connect_database
