@@ -10,12 +10,13 @@ production to a postgres database on Heroku.
 ## Setting the syncer up on Heroku
 ```bash
 $ heroku create -a cch-solar
-$ heroku addons:add scheduler:standard
-$ heroku addons:open scheduler # Add `./bin/energy2pg`
+$ heroku addons:add heroku-postgresql:hobby-basic
 $ heroku config:set SOLAREDGE_API_KEY=...
 $ heroku config:set SOLAREDGE_SITE_ID=...
-$ heroku addons:add heroku-postgresql:hobby-basic
 $ git push heroku master
+$ heroku run ./bin/setup
+$ heroku addons:add scheduler:standard
+$ heroku addons:open scheduler # Add `./bin/energy2pg`
 ```
 
 ## Installation

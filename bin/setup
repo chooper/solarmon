@@ -4,5 +4,5 @@ IFS=$'\n\t'
 set -vx
 
 bundle install
-
-# Do any other automated setup that you need to do here
+bundle exec ruby -e 'require "solaredge"; db = SolarEdge::Storage.connect_database; SolarEdge::Storage.create_database_tables!(db)'
+bundle exec sequel -m migrations $DATABASE_URL
