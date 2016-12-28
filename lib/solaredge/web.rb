@@ -26,8 +26,8 @@ module SolarEdge::Web
         siteID: r[:siteID],
         date: r[:date].strftime("%Y-%m-%d %H:%M:%S %z"),
         value: r[:value],
-        unit: r[:unit]},
-      }
+        unit: r[:unit],
+      }}
       {energy: presentable_values}.to_json
     end
   end

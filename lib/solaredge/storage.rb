@@ -33,7 +33,25 @@ module SolarEdge::Storage
     false
   end
 
-  def self.get_energy_values(db, where)
-    db.from(:energy).select(:siteID, :date, :value, :unit).where(where).order(:date).limit(20_000)
+  def self.save_energy_value(db, siteID:, date:, value:, unit:)
+    db[:energy].insert({
+      siteID: siteID,
+      date: date,
+      value: value,
+      unit: unit,
+    })
+  end
+
+  def self.get_energy_values(db, where, opts={})
+    limit = opts[:limit] || 20_000
+    db.from(:energy).select(:siteID, :date, :value, :unit).where(where).order(:date).limit(limit)
+  end
+
+  def self.count_energy_values(db, where)
+    self.get_energy_values(db, where, limit: 1).count
+  end
+
+  def self.energy_value_exists?(db, key)
+    self.count_energy_values(db, key) > 0
   end
 end
