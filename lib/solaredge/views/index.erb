@@ -159,7 +159,7 @@
 
       daily_g.append("g")
 	  .attr("class", "axis axis--y")
-	  .call(d3.axisLeft(daily_y).ticks(10, "%"))
+	  .call(d3.axisLeft(daily_y).ticks(10))
 	.append("text")
 	  .attr("transform", "rotate(-90)")
 	  .attr("y", 6)
@@ -168,13 +168,13 @@
 	  .text("Frequency");
 
       daily_g.selectAll(".bar")
-	.data(daily_energy)
+	.data(daily_energy.entries())
 	.enter().append("rect")
 	  .attr("class", "bar")
-	  .attr("x", function(d) { return daily_x(d[0]); })
-	  .attr("y", function(d) { return daily_y(d[1]); })
+	  .attr("x", function(d) { return daily_x(d.key); })
+	  .attr("y", function(d) { return daily_y(d.value); })
 	  .attr("width", daily_x.bandwidth())
-	  .attr("height", function(d) { return daily_height - daily_y(d[1]); });
+	  .attr("height", function(d) { return daily_height - daily_y(d.value); });
     });
   </script>
 </html>
