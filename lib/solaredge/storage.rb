@@ -32,4 +32,8 @@ module SolarEdge::Storage
     # TODO(charles) log this
     false
   end
+
+  def self.get_energy_values(db, where)
+    db.from(:energy).where(where).order(:date).limit(20_000)
+  end
 end
