@@ -4,6 +4,7 @@ require 'tzinfo'
 require "solaredge/api"
 require "solaredge/storage"
 require "solaredge/version"
+require "solaredge/web"
 
 # TODO(charles) replace puts with logging
 

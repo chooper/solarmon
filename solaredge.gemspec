@@ -28,9 +28,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "excon", "~> 0.54"
+  spec.add_dependency "pg", "~> 0.18"
   spec.add_dependency "pry", "~> 0.10"
   spec.add_dependency "sequel", "~> 4.36"
-  spec.add_dependency "pg", "~> 0.18"
+  spec.add_dependency "sinatra", "~> 1.4"
+  spec.add_dependency "thin", "~> 1.7"
   spec.add_dependency "tzinfo", "~> 1.2"
   spec.add_development_dependency "sqlite3", "~> 1.3"
   spec.add_development_dependency "bundler", "~> 1.12"
