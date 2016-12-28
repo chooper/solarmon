@@ -16,9 +16,18 @@
     </style>
   </head>
   <body>
-   <svg width="960" height="500"></svg>
+    <h1>Solar energy production</h1>
+    <svg width="960" height="500"></svg>
+    <div>
+      This site has produced <span id="todays_energy">?.???</span> kWh of
+      energy today and <span id="d90_energy">?.???</span> kWH in the past 90
+      days.
+     </div>
   </body>
   <script>
+    var todays_energy = d3.select("span#todays_energy");
+    var d90_energy = d3.select("span#d90_energy");
+
     var svg = d3.select("svg"),
 	margin = {top: 20, right: 20, bottom: 30, left: 50},
 	width = +svg.attr("width") - margin.left - margin.right,
@@ -40,14 +49,47 @@
     d3.json("/energy.json", function(error, data) {
       if (error) throw error;
 
+      // pre-process the data
       data = data.energy.map(function(d) {
 	d.date = parseTime(d.date);
 	d.value = +d.value;
         return d;
       });
-
       console.log(data);
 
+      // update today's energy
+      var today_epoch = new Date();
+      today_epoch.setHours(0);
+      today_epoch.setMinutes(0);
+      today_epoch.setSeconds(0);
+      today_epoch.setMilliseconds(0);
+
+      cumulative_energy = data.map(function(d) {
+        if(d.date > today_epoch) {
+          return d.value;
+        }
+      }).filter(function(v) {
+        return v != null;
+      }).reduce(function(a, b) {
+        return a + b;
+      })
+      console.log('today: cumulative energy')
+      console.log(cumulative_energy)
+      cumulative_energy_in_kwh = cumulative_energy / 1000;
+      todays_energy.text(cumulative_energy_in_kwh.toString());
+
+      // update 90 day energy
+      cumulative_energy = data.map(function(d) {
+        return d.value;
+      }).reduce(function(a, b) {
+        return a + b;
+      })
+      console.log('cumulative energy')
+      console.log(cumulative_energy)
+      cumulative_energy_in_kwh = cumulative_energy / 1000;
+      d90_energy.text(cumulative_energy_in_kwh.toString());
+
+      // update the graph
       x.domain(d3.extent(data, function(d) { return d.date; }));
       y.domain(d3.extent(data, function(d) { return d.value; }));
 
