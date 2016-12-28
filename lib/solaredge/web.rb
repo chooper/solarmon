@@ -22,8 +22,12 @@ module SolarEdge::Web
       db = SolarEdge::Storage.connect_database
       values = SolarEdge::Storage.get_energy_values(db, {date: date_range})
 
-      # strip the primary key from the values
-      presentable_values = values.map {|r| {siteID: r[:siteID], date: r[:date].strftime("%Y-%m-%d %H:%M:%S %z"), value: r[:value], unit: r[:unit]}}
+      presentable_values = values.map {|r| {
+        siteID: r[:siteID],
+        date: r[:date].strftime("%Y-%m-%d %H:%M:%S %z"),
+        value: r[:value],
+        unit: r[:unit]},
+      }
       {energy: presentable_values}.to_json
     end
   end
