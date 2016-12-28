@@ -25,6 +25,7 @@
      </div>
   </body>
   <script>
+    var energy_data = null;
     var todays_energy = d3.select("span#todays_energy");
     var d90_energy = d3.select("span#d90_energy");
 
@@ -55,7 +56,10 @@
 	d.value = +d.value;
         return d;
       });
-      console.log(data);
+      // make data accessible from the global scope
+      // for poking at in console
+      energy_data = data;
+      console.log(energy_data);
 
       // update today's energy
       var today_epoch = new Date();
