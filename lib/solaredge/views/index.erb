@@ -36,14 +36,12 @@
     var todays_energy = d3.select("span#todays_energy");
     var d90_energy = d3.select("span#d90_energy");
 
+    // Begin 15 minute graph
     var m15_svg = d3.select("svg#m15graph"),
 	m15_margin = {top: 20, right: 20, bottom: 30, left: 50},
 	m15_width = +m15_svg.attr("width") - m15_margin.left - m15_margin.right,
 	m15_height = +m15_svg.attr("height") - m15_margin.top - m15_margin.bottom,
 	m15_g = m15_svg.append("g").attr("transform", "translate(" + m15_margin.left + "," + m15_margin.top + ")");
-
-//    var daily_svg = d3.select("svg#daily_energy"),
-//	daily_g = daily_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S %Z");
 
@@ -56,6 +54,18 @@
     var m15_line = d3.line()
 	.x(function(d) { return m15_x(d.date); })
 	.y(function(d) { return m15_y(d.value); });
+
+    // Begin daily graph
+    var daily_svg = d3.select("svg#daily_graph"),
+	daily_margin = {top: 20, right: 20, bottom: 30, left: 40},
+	daily_width = +daily_svg.attr("width") - daily_margin.left - daily_margin.right,
+	daily_height = +daily_svg.attr("height") - daily_margin.top - daily_margin.bottom;
+
+    var daily_x = d3.scaleBand().rangeRound([0, daily_width]).padding(0.1),
+	daily_y = d3.scaleLinear().rangeRound([daily_height, 0]);
+
+    var daily_g = daily_svg.append("g")
+	.attr("transform", "translate(" + daily_margin.left + "," + daily_margin.top + ")");
 
     d3.json("/energy.json", function(error, data) {
       if (error) throw error;
@@ -138,6 +148,33 @@
         }
         daily_energy.set(bucket, daily_energy.get(bucket) + d.value);
       });
+
+      daily_x.domain(daily_energy.keys());
+      daily_y.domain([0, d3.max(daily_energy.values())]);
+
+      daily_g.append("g")
+	  .attr("class", "axis axis--x")
+	  .attr("transform", "translate(0," + daily_height + ")")
+	  .call(d3.axisBottom(daily_x));
+
+      daily_g.append("g")
+	  .attr("class", "axis axis--y")
+	  .call(d3.axisLeft(daily_y).ticks(10, "%"))
+	.append("text")
+	  .attr("transform", "rotate(-90)")
+	  .attr("y", 6)
+	  .attr("dy", "0.71em")
+	  .attr("text-anchor", "end")
+	  .text("Frequency");
+
+      daily_g.selectAll(".bar")
+	.data(daily_energy)
+	.enter().append("rect")
+	  .attr("class", "bar")
+	  .attr("x", function(d) { return daily_x(d[0]); })
+	  .attr("y", function(d) { return daily_y(d[1]); })
+	  .attr("width", daily_x.bandwidth())
+	  .attr("height", function(d) { return daily_height - daily_y(d[1]); });
     });
   </script>
 </html>
