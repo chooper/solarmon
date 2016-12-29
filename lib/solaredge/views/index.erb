@@ -23,39 +23,47 @@
   </head>
   <body>
     <h1>Solar energy production</h1>
-    <svg width="960" height="500" id="m15graph"></svg>
+    <svg width="960" height="500" id="fifteen_minutegraph"></svg>
     <div>
       This site has produced <span id="todays_energy">?.???</span> kWh of
-      energy today and <span id="d90_energy">?.???</span> kWh in the past 90
+      energy today and <span id="ninety_day_energy">?.???</span> kWh in the past 90
       days.
      </div>
      <svg width="960" height="500" id="daily_graph"></svg>
   </body>
   <script>
-    var energy_data = null;
-    var todays_energy = d3.select("span#todays_energy");
-    var d90_energy = d3.select("span#d90_energy");
-
-    // Begin 15 minute graph
-    var m15_svg = d3.select("svg#m15graph"),
-	m15_margin = {top: 20, right: 20, bottom: 30, left: 50},
-	m15_width = +m15_svg.attr("width") - m15_margin.left - m15_margin.right,
-	m15_height = +m15_svg.attr("height") - m15_margin.top - m15_margin.bottom,
-	m15_g = m15_svg.append("g").attr("transform", "translate(" + m15_margin.left + "," + m15_margin.top + ")");
-
+    // FUNCTIONS
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S %Z");
+    var midnightOfTime = function(t) { return new Date(t.getYear(), t.getMonth(), t.getDate()); };
 
-    var m15_x = d3.scaleTime()
-	.rangeRound([0, m15_width]);
+    // GLOBALS
+    // this will be filled in later for access from console
+    var energy_data = null;
 
-    var m15_y = d3.scaleLinear()
-	.rangeRound([m15_height, 0]);
+    // the element which will contain how much energy we produced today
+    var todays_energy = d3.select("span#todays_energy");
 
-    var m15_line = d3.line()
-	.x(function(d) { return m15_x(d.date); })
-	.y(function(d) { return m15_y(d.value); });
+    // the element which will contain how much energy we produced the past 90 days
+    var ninety_day_energy = d3.select("span#ninety_day_energy");
 
-    // Begin daily graph
+    // SECTION: Initialize the 15 minute interval graph of energy production
+    var fifteen_minute_svg = d3.select("svg#fifteen_minutegraph"),
+	fifteen_minute_margin = {top: 20, right: 20, bottom: 30, left: 50},
+	fifteen_minute_width = +fifteen_minute_svg.attr("width") - fifteen_minute_margin.left - fifteen_minute_margin.right,
+	fifteen_minute_height = +fifteen_minute_svg.attr("height") - fifteen_minute_margin.top - fifteen_minute_margin.bottom,
+	fifteen_minute_g = fifteen_minute_svg.append("g").attr("transform", "translate(" + fifteen_minute_margin.left + "," + fifteen_minute_margin.top + ")");
+
+    var fifteen_minute_x = d3.scaleTime()
+	.rangeRound([0, fifteen_minute_width]);
+
+    var fifteen_minute_y = d3.scaleLinear()
+	.rangeRound([fifteen_minute_height, 0]);
+
+    var fifteen_minute_line = d3.line()
+	.x(function(d) { return fifteen_minute_x(d.date); })
+	.y(function(d) { return fifteen_minute_y(d.value); });
+
+    // SECTION: Initialize the daily graph of energy production
     var daily_svg = d3.select("svg#daily_graph"),
 	daily_margin = {top: 20, right: 20, bottom: 30, left: 40},
 	daily_width = +daily_svg.attr("width") - daily_margin.left - daily_margin.right,
@@ -70,26 +78,22 @@
     d3.json("/energy.json", function(error, data) {
       if (error) throw error;
 
-      // pre-process the data
+      // pre-process the data so we can work with the dates
       data = data.energy.map(function(d) {
 	d.date = parseTime(d.date);
 	d.value = +d.value;
         return d;
       });
-      // make data accessible from the global scope
-      // for poking at in console
+
+      // make data accessible from the global scope for poking at in console
       energy_data = data;
       console.log(energy_data);
 
-      // update today's energy
-      var today_epoch = new Date();
-      today_epoch.setHours(0);
-      today_epoch.setMinutes(0);
-      today_epoch.setSeconds(0);
-      today_epoch.setMilliseconds(0);
-
+      // SECTION: calculate the total number of watt-hours produced today
+      console.log('Updating todays_energy')
       cumulative_energy = data.map(function(d) {
-        if(d.date > today_epoch) {
+        // only report values from after midnight today
+        if(d.date > midnightOfTime(new Date())) {
           return d.value;
         }
       }).filter(function(v) {
@@ -97,34 +101,36 @@
       }).reduce(function(a, b) {
         return a + b;
       })
-      console.log('today: cumulative energy')
-      console.log(cumulative_energy)
+
+      // Display the result
       cumulative_energy_in_kwh = cumulative_energy / 1000;
       todays_energy.text(cumulative_energy_in_kwh.toString());
 
-      // update 90 day energy
+      // SECTION: calculate the total number of watt-hours produced in 90 days
+      console.log('Updating ninety_day_energy')
       cumulative_energy = data.map(function(d) {
         return d.value;
       }).reduce(function(a, b) {
         return a + b;
       })
-      console.log('cumulative energy')
-      console.log(cumulative_energy)
+
+      // Display the result
       cumulative_energy_in_kwh = cumulative_energy / 1000;
-      d90_energy.text(cumulative_energy_in_kwh.toString());
+      ninety_day_energy.text(cumulative_energy_in_kwh.toString());
 
-      // update the 15 minute graph
-      m15_x.domain(d3.extent(data, function(d) { return d.date; }));
-      m15_y.domain(d3.extent(data, function(d) { return d.value; }));
+      // SECTION: Update the 15 minute interval graph of energy production
+      console.log('Updating fifteen_minute graph')
+      fifteen_minute_x.domain(d3.extent(data, function(d) { return d.date; }));
+      fifteen_minute_y.domain(d3.extent(data, function(d) { return d.value; }));
 
-      m15_g.append("g")
+      fifteen_minute_g.append("g")
 	  .attr("class", "axis axis--x")
-	  .attr("transform", "translate(0," + m15_height + ")")
-	  .call(d3.axisBottom(m15_x));
+	  .attr("transform", "translate(0," + fifteen_minute_height + ")")
+	  .call(d3.axisBottom(fifteen_minute_x));
 
-      m15_g.append("g")
+      fifteen_minute_g.append("g")
 	  .attr("class", "axis axis--y")
-	  .call(d3.axisLeft(m15_y))
+	  .call(d3.axisLeft(fifteen_minute_y))
 	.append("text")
 	  .attr("fill", "#000")
 	  .attr("transform", "rotate(-90)")
@@ -133,22 +139,29 @@
 	  .style("text-anchor", "end")
 	  .text("Wh - Watt-Hours");
 
-      m15_g.append("path")
+      fifteen_minute_g.append("path")
 	  .datum(data)
 	  .attr("class", "line")
-	  .attr("d", m15_line);
+	  .attr("d", fifteen_minute_line);
 
-      // update daily energy
-      // bucket energy by day
+      // SECTION: Update the daily graph of energy production
+      console.log('Updating daily graph')
+
+      // bucket energy production by day
       daily_energy = d3.map();
       data.forEach(function(d) {
+        // Shorten the dates so they display better
+        // ALSO: d3 maps seem to convert keys to strings
         var bucket = d.date.getMonth().toString() + "/" + d.date.getDate().toString();
+        // If this is the first time seeing a date, initialize it to zero
         if(!daily_energy.has(bucket)) {
           daily_energy.set(bucket, 0);
         }
+        // Update the value we have for the date
         daily_energy.set(bucket, daily_energy.get(bucket) + d.value);
       });
 
+      // Update the graph with these values
       daily_x.domain(daily_energy.keys());
       daily_y.domain([0, d3.max(daily_energy.values())]);
 
