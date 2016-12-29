@@ -34,7 +34,7 @@
   <script>
     // FUNCTIONS
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S %Z");
-    var midnightOfTime = function(t) { return new Date(t.getYear(), t.getMonth(), t.getDate()); };
+    var midnightOfTime = function(t) { return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
 
     // GLOBALS
     // this will be filled in later for access from console
