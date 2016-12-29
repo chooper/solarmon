@@ -142,7 +142,7 @@
       // bucket energy by day
       daily_energy = d3.map();
       data.forEach(function(d) {
-        var bucket = new Date(d.date.getYear(), d.date.getMonth(), d.date.getDate());
+        var bucket = d.date.getMonth().toString() + "/" + d.date.getDate().toString();
         if(!daily_energy.has(bucket)) {
           daily_energy.set(bucket, 0);
         }
