@@ -26,8 +26,8 @@
     <svg width="960" height="500" id="fifteen_minutegraph"></svg>
     <div>
       This site has produced <span id="todays_energy">?.???</span> kWh of
-      energy today and <span id="ninety_day_energy">?.???</span> kWh in the past 90
-      days.
+      energy today, <span id="thirty_day_energy">?.???</span> kWh in the past 30 days,
+      and <span id="ninety_day_energy">?.???</span> kWh in the past 90 days.
      </div>
      <svg width="960" height="500" id="daily_graph"></svg>
   </body>
@@ -42,6 +42,9 @@
 
     // the element which will contain how much energy we produced today
     var todays_energy = d3.select("span#todays_energy");
+
+    // the element which will contain how much energy we produced the past 30 days
+    var thirty_day_energy = d3.select("span#thirty_day_energy");
 
     // the element which will contain how much energy we produced the past 90 days
     var ninety_day_energy = d3.select("span#ninety_day_energy");
@@ -90,7 +93,7 @@
       console.log(energy_data);
 
       // SECTION: calculate the total number of watt-hours produced today
-      console.log('Updating todays_energy')
+      console.log('Updating todays_energy');
       cumulative_energy = data.map(function(d) {
         // only report values from after midnight today
         if(d.date > midnightOfTime(new Date())) {
@@ -106,8 +109,26 @@
       cumulative_energy_in_kwh = cumulative_energy / 1000;
       todays_energy.text(cumulative_energy_in_kwh.toString());
 
+      // SECTION: calculate the total number of watt-hours produced in 30 days
+      console.log('Updating thirty_day_energy');
+      cumulative_energy = data.map(function(d) {
+        month_ago = new Date();
+        month_ago.setMonth(month_ago.getMonth() -1);
+        if(d.date > midnightOfTime(month_ago)) {
+          return d.value;
+        }
+      }).filter(function(v) {
+        return v != null;
+      }).reduce(function(a, b) {
+        return a + b;
+      }, 0);
+
+      // Display the result
+      cumulative_energy_in_kwh = cumulative_energy / 1000;
+      thirty_day_energy.text(cumulative_energy_in_kwh.toString());
+
       // SECTION: calculate the total number of watt-hours produced in 90 days
-      console.log('Updating ninety_day_energy')
+      console.log('Updating ninety_day_energy');
       cumulative_energy = data.map(function(d) {
         return d.value;
       }).reduce(function(a, b) {
