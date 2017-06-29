@@ -65,9 +65,8 @@ module SolarEdge
         value: value["value"],
         unit: unit}
 
-      records_inserted = 0
-      if SolarEdge::Storage.energy_value_exists?(@db, {siteID: record.fetch(:siteID), date: record.fetch(:date)})
-        puts "Skipping (#{record.fetch(:siteID)}, #{record.fetch(:date)}); already exists"
+      if SolarEdge::Storage.energy_value_exists?(@db, {siteID: record.fetch(:siteID), date: record.fetch(:date), value: record.fetch(:value)})
+        puts "Skipping (#{record.fetch(:siteID)}, #{record.fetch(:date)}, #{record.fetch(:value)}); already exists"
         false
       else
         SolarEdge::Storage.save_energy_value(@db, record)

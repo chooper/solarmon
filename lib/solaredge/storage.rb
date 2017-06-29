@@ -34,7 +34,7 @@ module SolarEdge::Storage
   end
 
   def self.save_energy_value(db, siteID:, date:, value:, unit:)
-    db[:energy].insert({
+    db[:energy].insert_conflict(target: [:siteID, :date], update: {value: value, unit: unit}).insert({
       siteID: siteID,
       date: date,
       value: value,
