@@ -4,5 +4,5 @@ IFS=$'\n\t'
 set -vx
 
 bundle install
-bundle exec ruby -e 'require "solaredge"; db = SolarEdge::Storage.connect_database; SolarEdge::Storage.create_database_tables!(db)'
+bundle exec ruby -e 'require "solarmon"; db = SolarEdge::Storage.connect_database; SolarEdge::Storage.create_database_tables!(db)'
 bundle exec sequel -E -m migrations $DATABASE_URL

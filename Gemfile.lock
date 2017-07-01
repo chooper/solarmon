@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    solaredge (0.1.0)
+    solarmon (0.1.0)
       erubis (~> 2.7)
       excon (~> 0.54)
       pg (~> 0.18)
@@ -53,7 +53,7 @@ DEPENDENCIES
   bundler (~> 1.12)
   minitest (~> 5.0)
   rake (~> 10.0)
-  solaredge!
+  solarmon!
   sqlite3 (~> 1.3)
 
 RUBY VERSION

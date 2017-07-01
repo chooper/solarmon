@@ -24,7 +24,7 @@ $ heroku addons:open scheduler # Add `./bin/energy2pg`
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'solaredge'
+gem 'solarmon'
 ```
 
 And then execute:
@@ -33,7 +33,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install solaredge
+    $ gem install solarmon
 
 ## Usage
 
@@ -54,7 +54,7 @@ git commits and tags, and push the `.gem` file to
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at
-https://github.com/[USERNAME]/solaredge. This project is intended to be a safe,
+https://github.com/chooper/solarmon. This project is intended to be a safe,
 welcoming space for collaboration, and contributors are expected to adhere to
 the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 

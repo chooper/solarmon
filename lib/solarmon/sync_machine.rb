@@ -1,6 +1,6 @@
 require 'tzinfo'
-require "solaredge/api"
-require "solaredge/storage"
+require "solarmon/api"
+require "solarmon/storage"
 
 # TODO(charles) replace puts with logging
 

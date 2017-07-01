@@ -1,6 +1,6 @@
 require 'json'
 require 'sinatra/base'
-require 'solaredge/version'
+require 'solarmon/version'
 
 module SolarEdge::Web
   class Application < Sinatra::Base

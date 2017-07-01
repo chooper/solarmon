@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
-require "solaredge"
+require "solarmon"
 
 def main
   api_key = ENV['SOLAREDGE_API_KEY']
