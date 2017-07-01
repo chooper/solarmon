@@ -11,7 +11,7 @@ def main
   site_id = ENV['SOLAREDGE_SITE_ID']
 #  raise "DATABASE_URL not found!" if !ENV['DATABASE_URL']
 
-  sm = SolarEdge::SyncMachine.new(site_id, api_key)
+  sm = SolarMon::SyncMachine.new(site_id, api_key)
   sm.sync!
 end
 

@@ -2,7 +2,7 @@ require 'json'
 require 'sinatra/base'
 require 'solarmon/version'
 
-module SolarEdge::Web
+module SolarMon::Web
   class Application < Sinatra::Base
     set :sessions, false
 
@@ -11,7 +11,7 @@ module SolarEdge::Web
     end
 
     get '/version' do
-      "SolarEdge #{SolarEdge::VERSION}"
+      "SolarMon #{SolarMon::VERSION}"
     end
 
     get '/energy.json' do
@@ -19,8 +19,8 @@ module SolarEdge::Web
       date = Time.now.getutc.to_date
       date_range = (date - 90)..(date + 1)
 
-      db = SolarEdge::Storage.connect_database
-      values = SolarEdge::Storage.get_energy_values(db, {date: date_range})
+      db = SolarMon::Storage.connect_database
+      values = SolarMon::Storage.get_energy_values(db, {date: date_range})
 
       presentable_values = values.map {|r| {
         siteID: r[:siteID],

@@ -1,4 +1,4 @@
-module SolarEdge; end
+module SolarMon; end
 
 require 'tzinfo'
 require "solarmon/api"

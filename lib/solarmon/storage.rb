@@ -2,7 +2,7 @@ require "sequel"
 require "logger"
 require "pg"
 
-module SolarEdge::Storage
+module SolarMon::Storage
   def self.connect_database
     url = ENV['DATABASE_URL'] || 'sqlite://db.sqlite'
     max_conns = (ENV['SQL_CONNS'] || 1).to_i

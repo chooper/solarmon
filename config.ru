@@ -1,2 +1,2 @@
 require 'solarmon'
-run SolarEdge::Web::Application
+run SolarMon::Web::Application

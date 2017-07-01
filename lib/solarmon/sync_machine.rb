@@ -4,14 +4,14 @@ require "solarmon/storage"
 
 # TODO(charles) replace puts with logging
 
-module SolarEdge
+module SolarMon
   class SyncMachine
 
     EXPECTED_UNIT = 'Wh'
 
     def initialize(site_id, api_key)
       @site_id = site_id
-      @api = SolarEdge::Api.new(api_key)
+      @api = SolarMon::Api.new(api_key)
       @tz = TZInfo::Timezone.get(ENV['TZ'])
       # HACK(charles) Figure out if we're PST vs PDT
       @tz_name = @tz.offsets_up_to(Time.now.getutc, Time.now.getutc - 1).first.abbreviation.to_s
@@ -65,19 +65,19 @@ module SolarEdge
         value: value["value"],
         unit: unit}
 
-      if SolarEdge::Storage.energy_value_exists?(@db, {siteID: record.fetch(:siteID), date: record.fetch(:date), value: record.fetch(:value)})
+      if SolarMon::Storage.energy_value_exists?(@db, {siteID: record.fetch(:siteID), date: record.fetch(:date), value: record.fetch(:value)})
         puts "Skipping (#{record.fetch(:siteID)}, #{record.fetch(:date)}, #{record.fetch(:value)}); already exists"
         false
       else
-        SolarEdge::Storage.save_energy_value(@db, record)
+        SolarMon::Storage.save_energy_value(@db, record)
         true
       end
     end
 
     def connect_database
       puts "Connecting to database"
-      @db = SolarEdge::Storage.connect_database
-      SolarEdge::Storage.create_database_tables!(@db)
+      @db = SolarMon::Storage.connect_database
+      SolarMon::Storage.create_database_tables!(@db)
       @db
     end
   end

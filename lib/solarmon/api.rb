@@ -1,7 +1,7 @@
 require "json"
 require "excon"
 
-module SolarEdge
+module SolarMon
   class Api
 
     BASE_URL = 'https://monitoringapi.solaredge.com'

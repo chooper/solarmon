@@ -7,7 +7,7 @@ def main
   api_key = ENV['SOLAREDGE_API_KEY']
   site_id = ENV['SOLAREDGE_SITE_ID']
 
-  api = SolarEdge::Api.new(api_key)
+  api = SolarMon::Api.new(api_key)
   response = api.site_energy(site_id: site_id,
     start_date: Time.now,
     end_date: Time.now,
