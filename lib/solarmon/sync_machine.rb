@@ -21,7 +21,7 @@ module SolarMon
 
     def sync!(start_date: nil, end_date: nil)
       connect_database
-      energy_values, energy_unit = get_energy_values_from_api(start_date, end_date)
+      energy_values, energy_unit = get_energy_values_from_api(start_date: start_date, end_date: end_date)
       save_values_to_database(energy_values, energy_unit)
     end
 
