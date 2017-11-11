@@ -19,9 +19,9 @@ module SolarMon
 
     attr_reader :site_id, :tz, :tz_name
 
-    def sync!
+    def sync!(start_date: nil, end_date: nil)
       connect_database
-      energy_values, energy_unit = get_energy_values_from_api
+      energy_values, energy_unit = get_energy_values_from_api(start_date, end_date)
       save_values_to_database(energy_values, energy_unit)
     end
 
