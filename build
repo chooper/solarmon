@@ -1,0 +1,3 @@
+#!/bin/bash
+set -eux -o pipefail
+docker build -t="solarmon" .

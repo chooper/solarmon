@@ -1,0 +1,3 @@
+#!/bin/bash
+set -eux -o pipefail
+docker run --env-file .env solarmon:latest /app/bin/energy

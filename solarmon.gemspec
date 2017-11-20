@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "erubis", "~> 2.7"
   spec.add_dependency "excon", "~> 0.54"
   spec.add_dependency "pg", "~> 0.18"
   spec.add_dependency "pry", "~> 0.10"
@@ -35,8 +34,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sinatra", "~> 1.4"
   spec.add_dependency "thin", "~> 1.7"
   spec.add_dependency "tzinfo", "~> 1.2"
+  spec.add_dependency "bundler", "~> 1.12"
+  spec.add_dependency "rake", "~> 10.0"
   spec.add_development_dependency "sqlite3", "~> 1.3"
-  spec.add_development_dependency "bundler", "~> 1.12"
-  spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
 end
