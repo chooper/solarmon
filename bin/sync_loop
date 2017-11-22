@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "solarmon/sync_machine"
+require "env"
+
+DEFAULT_LOOP_INTERVAL = 600 # seconds
+
+def main
+  ENV.source('.env') if !ENV['SOLAREDGE_API_KEY'] && !ENV['SOLAREDGE_SITE_ID']
+
+  api_key = ENV['SOLAREDGE_API_KEY']
+  site_id = ENV['SOLAREDGE_SITE_ID']
+  loop_interval = ENV['LOOP_INTERVAL'].to_i || DEFAULT_LOOP_INTERVAL
+
+  sm = SolarMon::SyncMachine.new(site_id, api_key)
+
+  loop do
+    last_run_start = Time.now
+    next_deadline = last_run_start + loop_interval
+    sm.sync!
+    sleep_for = next_deadline - Time.now
+    if sleep_for < 0
+      puts "WARN sync operation took longer than loop interval!"
+    else
+      sleep(sleep_for)
+    end
+  end
+end
+
+if $0 == __FILE__
+  main
+end
