@@ -5,6 +5,7 @@ require 'solarmon/version'
 module SolarMon::Web
   class Application < Sinatra::Base
     set :sessions, false
+    enable :logging
 
     get '/' do
       erb :index
