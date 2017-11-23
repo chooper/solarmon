@@ -11,14 +11,20 @@ def main
 
   api_key = ENV['SOLAREDGE_API_KEY']
   site_id = ENV['SOLAREDGE_SITE_ID']
-  loop_interval = ENV['LOOP_INTERVAL'].to_i || DEFAULT_LOOP_INTERVAL
+  loop_interval = (ENV['LOOP_INTERVAL'] || DEFAULT_LOOP_INTERVAL).to_i
 
   sm = SolarMon::SyncMachine.new(site_id, api_key)
 
   loop do
     last_run_start = Time.now
     next_deadline = last_run_start + loop_interval
-    sm.sync!
+
+    begin
+      sm.sync!
+    rescue SolarMon::RateLimitedError
+      puts "We were rated limited by the API (HTTP 429); sleeping like normal"
+    end
+
     sleep_for = next_deadline - Time.now
     if sleep_for < 0
       puts "WARN sync operation took longer than loop interval!"

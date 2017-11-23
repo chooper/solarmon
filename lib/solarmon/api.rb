@@ -2,8 +2,10 @@ require "json"
 require "excon"
 
 module SolarMon
-  class Api
+  class UnknownApiError < StandardError; end
+  class RateLimitedError < StandardError; end
 
+  class Api
     BASE_URL = 'https://monitoringapi.solaredge.com'
     ALLOWED_TIME_UNITS = %w{QUARTER_OF_AN_HOUR HOUR DAY WEEK MONTH YEAR}
 
@@ -49,6 +51,11 @@ module SolarMon
       url += '?' + params.map {|k,v| "#{k}=#{v}"}.join('&')
 
       response = Excon.get(url)
+
+
+      raise RateLimitedError.new("Got rate limited by the API") if response.status == 429
+      raise UnknownApiError.new("Got HTTP #{response.status} back: #{response.body}") if response.status >= 400
+
       body = response.body
       JSON.parse(body)
     end
