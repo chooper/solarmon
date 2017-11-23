@@ -15,6 +15,12 @@ module SolarMon::Storage
     db
   end
 
+  def self.disconnect_database(db)
+    if db
+      db.disconnect
+    end
+  end
+
   def self.create_database_tables!(db)
     create_energy_table!(db)
   end

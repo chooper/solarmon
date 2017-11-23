@@ -29,6 +29,8 @@ module SolarMon::Web
         value: r[:value],
         unit: r[:unit],
       }}
+
+      SolarMon::Storage.disconnect_database(db)
       {energy: presentable_values}.to_json
     end
   end

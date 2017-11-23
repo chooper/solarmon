@@ -23,6 +23,7 @@ module SolarMon
       connect_database
       energy_values, energy_unit = get_energy_values_from_api(start_date: start_date, end_date: end_date)
       save_values_to_database(energy_values, energy_unit)
+      disconnect_database
     end
 
     def get_energy_values_from_api(start_date: nil, end_date: nil)
@@ -79,6 +80,14 @@ module SolarMon
       @db = SolarMon::Storage.connect_database
       SolarMon::Storage.create_database_tables!(@db)
       @db
+    end
+
+    def disconnect_database
+      puts "Closing database connections"
+      if @db
+        SolarMon::Storage.disconnect_database(@db)
+        @db = nil
+      end
     end
   end
 end
