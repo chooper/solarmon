@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "solarmon/sync_machine"
+require "env"
+
+def main
+  ENV.source('.env') if !ENV['SOLAREDGE_API_KEY'] && !ENV['SOLAREDGE_SITE_ID']
+
+  api_key = ENV['SOLAREDGE_API_KEY']
+  site_id = ENV['SOLAREDGE_SITE_ID']
+#  raise "DATABASE_URL not found!" if !ENV['DATABASE_URL']
+
+  sm = SolarMon::SyncMachine.new(site_id, api_key)
+  3.times do |i|
+    start_date = Time.now.getutc - 60*60*24*30*(i+1)
+    end_date = Time.now.getutc - 60*60*24*30*i
+
+    sm.sync!(start_date: start_date, end_date: end_date)
+  end
+end
+
+if $0 == __FILE__
+  main
+end
