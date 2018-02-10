@@ -20,8 +20,13 @@ module SolarMon::Web
       date = Time.now.getutc.to_date
       date_range = (date - 1)..(date + 1)
 
-      db = SolarMon::Storage.connect_database
-      values = SolarMon::Storage.get_energy_values(db, {date: date_range})
+      begin
+        db = SolarMon::Storage.connect_database
+        values = SolarMon::Storage.get_energy_values(db, {date: date_range})
+        SolarMon::Storage.disconnect_database(db)
+      rescue => exc
+        halt 500, {status: 'FAIL', msg: 'databass', e: exc}.to_json
+      end
 
       # find the most recent data point and ensure it's < 12 hours old
       value = values.sort_by {|v| v[:date]}.last
@@ -29,7 +34,6 @@ module SolarMon::Web
         halt 500, {status: 'FAIL', msg: 'data is not fresh', most_recent_value: value}.to_json
       end
 
-      SolarMon::Storage.disconnect_database(db)
       {status: 'OK', most_recent_value: value}.to_json
     end
 
